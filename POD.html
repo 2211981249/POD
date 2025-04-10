@@ -626,3 +626,108 @@ const App = () => {
 };
 
 export default App;
+
+
+
+-------------------------------------------------------------------------------------
+
+student data code 
+-----------------------------------------------------------------------------------------
+
+[
+  { "id": "101", "name": "Alice Johnson" },
+  { "id": "102", "name": "Bob Smith" },
+  { "id": "103", "name": "Charlie Brown" },
+  { "id": "104", "name": "Diana Prince" }
+]
+
+
+
+
+studentList.tsx   
+
+
+import React, { useEffect, useState } from "react";
+
+interface Student {
+  id: string;
+  name: string;
+}
+
+const StudentList: React.FC = () => {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [filtered, setFiltered] = useState<Student[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    fetch("/students.json")
+      .then((res) => res.json())
+      .then((data: Student[]) => {
+        setStudents(data);
+        setFiltered(data);
+      });
+  }, []);
+
+  const handleSearch = () => {
+    const search = searchTerm.toLowerCase();
+    const results = students.filter((student) =>
+      student.name.toLowerCase().includes(search)
+    );
+    setFiltered(results);
+  };
+
+  return (
+    <div className="max-w-xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Student List</h1>
+      <div className="flex gap-2 mb-4">
+        <input
+          type="text"
+          placeholder="Search by name"
+          className="border rounded p-2 flex-1"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <button
+          onClick={handleSearch}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Search
+        </button>
+      </div>
+      <ul className="space-y-2">
+        {filtered.map((student) => (
+          <li
+            key={student.id}
+            className="bg-white shadow p-3 rounded border"
+          >
+            <span className="font-semibold">{student.name}</span> (ID: {student.id})
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default StudentList;
+
+
+
+
+
+App.tsx  
+
+
+import React from "react";
+import StudentList from "./StudentList";
+
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <StudentList />
+    </div>
+  );
+}
+
+export default App;
+
+
